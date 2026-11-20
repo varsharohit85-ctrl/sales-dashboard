@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<html lang="en"><head><base href="https://d16ilfvy4mv02r.cloudfront.net/workspaces/jSlblxwJsCwWWXxpbMmUdhsYVC9EssQc/a7419c17-d83f-46cc-aa80-70571a0337ea/files/"><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Sales performance dashboard</title>
+<style>
+  :root {
+    --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f1f5f9;
+    --blue:#2563eb; --green:#10b981; --amber:#f59e0b; --violet:#8b5cf6;
+    --sky:#0ea5e9; --rose:#ec4899; --red:#ef4444;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  .wrap { max-width:1200px; margin:0 auto; padding:28px 20px 56px; }
+  header { background:linear-gradient(120deg,#1e3a8a 0%,#2563eb 42%,#7c3aed 78%,#db2777 100%);
+           border-radius:20px; padding:34px 34px 30px; color:#fff;
+           box-shadow:0 18px 40px -18px rgba(30,58,138,.55); }
+  header h1 { margin:0 0 8px; font-size:30px; letter-spacing:-.4px; }
+  header .sub { opacity:.9; font-size:13.5px; }
+  .badges { margin-top:18px; display:flex; gap:8px; flex-wrap:wrap; }
+  .badge { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3);
+           padding:6px 12px; border-radius:999px; font-size:11.5px; font-weight:600; letter-spacing:.2px; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:22px; }
+  .kpi { border-radius:16px; padding:16px 18px 18px; border:1px solid transparent;
+         box-shadow:0 1px 2px rgba(15,23,42,.05); }
+  .kpi-label { font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; opacity:.8; }
+  .kpi-value { font-size:26px; font-weight:800; margin-top:6px; letter-spacing:-.6px; }
+  .k-blue   { background:#dbeafe; color:#1d4ed8; border-color:#bfdbfe; }
+  .k-green  { background:#dcfce7; color:#15803d; border-color:#bbf7d0; }
+  .k-amber  { background:#fef3c7; color:#b45309; border-color:#fde68a; }
+  .k-violet { background:#ede9fe; color:#6d28d9; border-color:#ddd6fe; }
+  .k-sky    { background:#cffafe; color:#0e7490; border-color:#a5f3fc; }
+  .k-rose   { background:#fce7f3; color:#be185d; border-color:#fbcfe8; }
+  .k-red2   { background:#fee2e2; color:#b91c1c; border-color:#fecaca; }
+  .k-slate  { background:#e2e8f0; color:#334155; border-color:#cbd5e1; }
+  section { background:#fff; border:1px solid var(--line); border-radius:18px;
+            padding:22px 24px; margin-top:20px; box-shadow:0 1px 3px rgba(15,23,42,.06); }
+  h2 { font-size:15px; margin:0 0 4px; letter-spacing:-.2px; }
+  .hint { color:var(--muted); font-size:12.5px; margin:0 0 16px; }
+  .chart { width:100%; height:auto; display:block; }
+  .bar-row { display:grid; grid-template-columns:190px 1fr 92px; align-items:center; gap:12px;
+             padding:5px 0; font-size:12.5px; }
+  .bar-label { color:#334155; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bar-track { background:#f1f5f9; border-radius:999px; height:12px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:999px; }
+  .bar-value { text-align:right; font-weight:700; font-variant-numeric:tabular-nums; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  th { text-align:left; color:#1e3a8a; background:#dbeafe; padding:9px 10px; font-size:11px;
+       text-transform:uppercase; letter-spacing:.05em; }
+  th:first-child { border-radius:9px 0 0 9px; }
+  th:last-child { border-radius:0 9px 9px 0; }
+  td { padding:9px 10px; border-bottom:1px solid #eef2f7; font-variant-numeric:tabular-nums; }
+  tr:last-child td { border-bottom:none; }
+  .pos { color:#15803d; font-weight:700; } .neg { color:#dc2626; font-weight:700; }
+  .pill { display:inline-block; padding:5px 11px; border-radius:999px; font-size:11.5px;
+          font-weight:700; margin:0 6px 6px 0; }
+  .pill.neg { background:#fee2e2; color:#b91c1c; }
+  .pill.pos { background:#dcfce7; color:#15803d; }
+  .muted { color:var(--muted); }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  footer { margin-top:22px; color:var(--muted); font-size:11.5px; text-align:center; }
+  @media (max-width:900px) {
+    .grid { grid-template-columns:repeat(2,1fr); }
+    .two { grid-template-columns:1fr; }
+    .bar-row { grid-template-columns:120px 1fr 80px; }
+  }
+  @media print { body { background:#fff; } section, header { box-shadow:none; } }
+</style></head>
+<body><div class="wrap">
+<header>
+  <h1>Business Analytics — Sales Performance</h1>
+  <div class="sub">9,994 order lines · 793 customers · 2014-01-03 → 2017-12-30</div>
+  <div class="badges">
+    <span class="badge">Full dataset — no filters</span>
+    <span class="badge">Margin 12.5%</span>
+    <span class="badge">1,871 loss-making lines</span>
+    <span class="badge">Self-contained HTML</span>
+  </div>
+</header>
+
+<div class="grid">
+  <div class="kpi k-blue"><div class="kpi-label">Total sales</div><div class="kpi-value">$2,297,201</div></div>
+  <div class="kpi k-green"><div class="kpi-label">Total profit</div><div class="kpi-value">$286,397</div></div>
+  <div class="kpi k-amber"><div class="kpi-label">Profit margin</div><div class="kpi-value">12.5%</div></div>
+  <div class="kpi k-violet"><div class="kpi-label">Orders</div><div class="kpi-value">5,009</div></div>
+  <div class="kpi k-sky"><div class="kpi-label">Average order value</div><div class="kpi-value">$459</div></div>
+  <div class="kpi k-rose"><div class="kpi-label">Customers</div><div class="kpi-value">793</div></div>
+  <div class="kpi k-red2"><div class="kpi-label">Loss-making lines</div><div class="kpi-value">1,871</div></div>
+  <div class="kpi k-slate"><div class="kpi-label">Profit given back</div><div class="kpi-value">-$156,132</div></div>
+</div>
+
+<section>
+  <h2>Monthly sales</h2>
+  <p class="hint">Blue area — sales across 48 months, with September and Q4 peaks.</p>
+  <svg viewBox="0 0 1120 240" class="chart" role="img">
+    <defs><linearGradient id="gs" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.40"/>
+      <stop offset="100%" stop-color="#2563eb" stop-opacity="0.02"/></linearGradient></defs>
+    <line x1="34" y1="34" x2="1086" y2="34" stroke="#e2e8f0"/>
+    <line x1="34" y1="77" x2="1086" y2="77" stroke="#e2e8f0"/>
+    <line x1="34" y1="120" x2="1086" y2="120" stroke="#e2e8f0"/>
+    <line x1="34" y1="163" x2="1086" y2="163" stroke="#e2e8f0"/>
+    <line x1="34" y1="206" x2="1086" y2="206" stroke="#e2e8f0"/>
+    <path d="M34,206 L34,197 L56,202 L78,163 L100,186 L122,190 L144,180 L166,181 L188,186 L210,160 L232,184 L254,164 L276,169 L298,192 L320,199 L342,184 L364,187 L386,191 L408,188 L430,183 L452,170 L474,184 L496,167 L518,168 L540,191 L562,187 L584,164 L606,176 L628,173 L650,177 L672,184 L694,163 L716,171 L738,154 L760,168 L782,199 L804,193 L826,163 L848,183 L870,167 L892,185 L914,176 L936,170 L958,159 L980,166 L1002,170 L1024,150 L1046,141 L1068,163 L1086,158 L1086,206 Z" fill="url(#gs)"/>
+    <polyline points="34,197 56,202 78,163 100,186 122,190 144,180 166,181 188,186 210,160 232,184 254,164 276,169 298,192 320,199 342,184 364,187 386,191 408,188 430,183 452,170 474,184 496,167 518,168 540,191 562,187 584,164 606,176 628,173 650,177 672,184 694,163 716,171 738,154 760,168 782,199 804,193 826,163 848,183 870,167 892,185 914,176 936,170 958,159 980,166 1002,170 1024,150 1046,141 1068,163 1086,158" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round"/>
+    <text x="28" y="37" fill="#94a3b8" font-size="10" text-anchor="end">118,448</text>
+    <text x="28" y="209" fill="#94a3b8" font-size="10" text-anchor="end">0</text>
+    <text x="34" y="230" fill="#64748b" font-size="10" text-anchor="middle">14-01</text>
+    <text x="298" y="230" fill="#64748b" font-size="10" text-anchor="middle">15-01</text>
+    <text x="562" y="230" fill="#64748b" font-size="10" text-anchor="middle">16-01</text>
+    <text x="826" y="230" fill="#64748b" font-size="10" text-anchor="middle">17-01</text>
+    <text x="1086" y="230" fill="#64748b" font-size="10" text-anchor="middle">17-12</text>
+  </svg>
+</section>
+
+<section>
+  <h2>Sales by category</h2>
+  <p class="hint">Where revenue comes from, ranked.</p>
+  <div class="bar-row"><div class="bar-label" title="Technology">Technology</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#2563eb"></div></div><div class="bar-value" style="color:#2563eb">$836,154</div></div>
+  <div class="bar-row"><div class="bar-label" title="Furniture">Furniture</div><div class="bar-track"><div class="bar-fill" style="width:88.7%;background:#f97316"></div></div><div class="bar-value" style="color:#f97316">$742,000</div></div>
+  <div class="bar-row"><div class="bar-label" title="Office Supplies">Office Supplies</div><div class="bar-track"><div class="bar-fill" style="width:86.0%;background:#10b981"></div></div><div class="bar-value" style="color:#10b981">$719,047</div></div>
+</section>
+
+<div class="two">
+  <section>
+    <h2>Profit by sub-category</h2>
+    <p class="hint">Red bars destroy value.</p>
+    <div class="bar-row"><div class="bar-label">Copiers</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#7c3aed"></div></div><div class="bar-value" style="color:#7c3aed">$55,618</div></div>
+    <div class="bar-row"><div class="bar-label">Phones</div><div class="bar-track"><div class="bar-fill" style="width:80.0%;background:#7c3aed"></div></div><div class="bar-value" style="color:#7c3aed">$44,516</div></div>
+    <div class="bar-row"><div class="bar-label">Accessories</div><div class="bar-track"><div class="bar-fill" style="width:75.4%;background:#7c3aed"></div></div><div class="bar-value" style="color:#7c3aed">$41,937</div></div>
+    <div class="bar-row"><div class="bar-label">Paper</div><div class="bar-track"><div class="bar-fill" style="width:61.2%;background:#7c3aed"></div></div><div class="bar-value" style="color:#7c3aed">$34,054</div></div>
+    <div class="bar-row"><div class="bar-label">Binders</div><div class="bar-track"><div class="bar-fill" style="width:54.3%;background:#7c3aed"></div></div><div class="bar-value" style="color:#7c3aed">$30,222</div></div>
+    <div class="bar-row"><div class="bar-label">Chairs</div><div class="bar-track"><div class="bar-fill" style="width:47.8%;background:#7c3aed"></div></div><div class="bar-value" style="color:#7c3aed">$26,590</div></div>
+    <div class="bar-row"><div class="bar-label">Storage</div><div class="bar-track"><div class="bar-fill" style="width:38.3%;background:#7c3aed"></div></div><div class="bar-value" style="color:#7c3aed">$21,279</div></div>
+    <div class="bar-row"><div class="bar-label">Machines</div><div class="bar-track"><div class="bar-fill" style="width:6.1%;background:#7c3aed"></div></div><div class="bar-value" style="color:#7c3aed">$3,385</div></div>
+    <div class="bar-row"><div class="bar-label">Supplies</div><div class="bar-track"><div class="bar-fill" style="width:2.1%;background:#ef4444"></div></div><div class="bar-value" style="color:#ef4444">-$1,189</div></div>
+    <div class="bar-row"><div class="bar-label">Tables</div><div class="bar-track"><div class="bar-fill" style="width:31.9%;background:#ef4444"></div></div><div class="bar-value" style="color:#ef4444">-$17,725</div></div>
+  </section>
+  <section>
+    <h2>Profit by region</h2>
+    <p class="hint">Absolute profit contribution.</p>
+    <div class="bar-row"><div class="bar-label">West</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#2563eb"></div></div><div class="bar-value" style="color:#2563eb">$108,418</div></div>
+    <div class="bar-row"><div class="bar-label">East</div><div class="bar-track"><div class="bar-fill" style="width:84.4%;background:#2563eb"></div></div><div class="bar-value" style="color:#2563eb">$91,523</div></div>
+    <div class="bar-row"><div class="bar-label">South</div><div class="bar-track"><div class="bar-fill" style="width:43.1%;background:#2563eb"></div></div><div class="bar-value" style="color:#2563eb">$46,749</div></div>
+    <div class="bar-row"><div class="bar-label">Central</div><div class="bar-track"><div class="bar-fill" style="width:36.6%;background:#2563eb"></div></div><div class="bar-value" style="color:#2563eb">$39,706</div></div>
+  </section>
+</div>
+
+<section>
+  <h2>Region detail</h2>
+  <table><thead><tr><th>Region</th><th>Sales</th><th>Profit</th><th>Margin</th><th>Customers</th></tr></thead>
+  <tbody>
+    <tr><td><b>West</b></td><td>$725,458</td><td>$108,418</td><td class="pos">14.9%</td><td>686</td></tr>
+    <tr><td><b>East</b></td><td>$678,781</td><td>$91,523</td><td class="pos">13.5%</td><td>674</td></tr>
+    <tr><td><b>Central</b></td><td>$501,240</td><td>$39,706</td><td class="pos">7.9%</td><td>629</td></tr>
+    <tr><td><b>South</b></td><td>$391,722</td><td>$46,749</td><td class="pos">11.9%</td><td>512</td></tr>
+  </tbody></table>
+</section>
+
+<section>
+  <h2>Worst orders by profit</h2>
+  <p class="hint">Every one of these was heavily discounted.</p>
+  <table><thead><tr><th>Order</th><th>Product</th><th>Discount</th><th>Profit</th></tr></thead>
+  <tbody>
+    <tr><td>CA-2016-108196</td><td>Cubify CubeX 3D Printer Double Head Print</td><td>70.0%</td><td class="neg">-$6,600</td></tr>
+    <tr><td>US-2017-168116</td><td>Cubify CubeX 3D Printer Triple Head Print</td><td>50.0%</td><td class="neg">-$3,840</td></tr>
+    <tr><td>CA-2014-169019</td><td>GBC DocuBind P400 Electric Binding System</td><td>80.0%</td><td class="neg">-$3,702</td></tr>
+    <tr><td>CA-2017-134845</td><td>Lexmark MX611dhe Monochrome Laser Printer</td><td>70.0%</td><td class="neg">-$3,400</td></tr>
+    <tr><td>US-2017-122714</td><td>Ibico EPK-21 Electric Binding System</td><td>80.0%</td><td class="neg">-$2,929</td></tr>
+  </tbody></table>
+  <p class="hint" style="margin-top:14px">Loss-making sub-categories</p>
+  <div>
+    <span class="pill neg">Tables: -$17,725</span>
+    <span class="pill neg">Bookcases: -$3,473</span>
+    <span class="pill neg">Supplies: -$1,189</span>
+  </div>
+</section>
+
+<footer>Built from 9,994 rows · figures computed directly from the dataset · profit is the recorded Profit column</footer>
+</div></body></html>
